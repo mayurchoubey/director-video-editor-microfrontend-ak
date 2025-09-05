@@ -121,26 +121,35 @@ export const useDownloadState = create<DownloadState>((set, get) => ({
         const serializedPayload = serializeDesign(payload);
 
         // Step 1: POST request to start rendering using authenticated primary app API
-        const jobInfo = await callPrimaryAppAPI(api.render, {
+        const randId = Math.floor(Math.random() * 9999) + 1;
+        const outputFileName = `demo-vid-${randId}.mp4`;
+        const payloadData = {videoData: {
           design: serializedPayload,
           options: {
             fps: 30,
             size: serializedPayload.size,
             format: "mp4",
           },
-        }, 'POST');
+        }, outputFileName};
+        console.log("outputFileName="+outputFileName, payloadData);
+        const jobInfo = await callPrimaryAppAPI(api.render, payloadData, 'POST');
 
+        if(jobInfo?.status ==="success"){
+          set({ 
+            exporting: false, 
+            displayProgressModal: true,
+            output: { 
+              url: '', 
+              type: get().exportType,
+              jobId: jobInfo?.render_id || jobInfo?.data?.renderId || 'unknown',
+              renderInfo: jobInfo
+            }
+          });
+        } else {
+          set({ exporting: false });
+        }
         // Job successfully queued - show completion modal directly
-        set({ 
-          exporting: false, 
-          displayProgressModal: true,
-          output: { 
-            url: '', 
-            type: get().exportType,
-            jobId: jobInfo.render_id || 'unknown',
-            renderInfo: jobInfo
-          }
-        });
+        
       } catch (error) {
         console.error(error);
         set({ exporting: false });
