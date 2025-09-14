@@ -131,28 +131,72 @@ export const useDownloadState = create<DownloadState>((set, get) => ({
             format: "mp4",
           },
         }, outputFileName};
+        //setTimeout(()=>{
+
+        
         console.log("outputFileName="+outputFileName, payloadData);
         const jobInfo = await callPrimaryAppAPI(api.render, payloadData, 'POST');
+      //   const jobInfo = {
+      //     "statusCode": 201,
+      //     "status": "error",
+      //     "message": "Video is not created",          
+      //     "data": {
+      //         "fileURL": "https://remotionlambda-useast1-3rne5v73bs.s3.us-east-1.amazonaws.com/demo-vid-7304.mp4",
+      //         "outputKey": "demo-vid-7304.mp4",
+      //         "renderId": "9cq37ncm5w",
+      //         "created_at": "2025-09-08",
+      //         "bucketName": "remotionlambda-useast1-3rne5v73bs"
+      //     }
+      // };
 
         if(jobInfo?.status ==="success"){
           set({ 
             exporting: false, 
             displayProgressModal: true,
             output: { 
-              url: '', 
+              url: jobInfo?.data?.fileURL, 
               type: get().exportType,
-              jobId: jobInfo?.render_id || jobInfo?.data?.renderId || 'unknown',
-              renderInfo: jobInfo
+              jobId: jobInfo?.data?.renderId || 'unknown',
+              renderInfo: {
+                status : jobInfo?.status, message:jobInfo?.message, render_id:jobInfo?.data?.renderId
+                ,created_at:jobInfo?.data?.created_at, 
+                bucket_name: jobInfo?.data?.bucketName
+              }
             }
           });
         } else {
-          set({ exporting: false });
+          set({ exporting: false, 
+            displayProgressModal: true,
+            output: { 
+              url: "", 
+              type: get().exportType,
+              jobId: jobInfo?.data?.renderId || 'unknown',
+              renderInfo: { status: "error", message: jobInfo?.message,
+                render_id:"",
+                created_at:"", 
+                bucket_name: ""
+              }
+            } 
+          });
         }
+        //},4000);
         // Job successfully queued - show completion modal directly
         
       } catch (error) {
         console.error(error);
-        set({ exporting: false });
+        set({ exporting: false, 
+          displayProgressModal: true,
+          output: { 
+          url: "", 
+          type: "",
+          jobId: 'unknown',
+          renderInfo: { status: "error", message: "Error: Video is not rendered, please try again later",
+            render_id:"",
+            created_at:"", 
+            bucket_name: ""}
+          } 
+        });
+
       }
     },
   },

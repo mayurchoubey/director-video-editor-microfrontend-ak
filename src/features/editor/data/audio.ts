@@ -3,6 +3,17 @@ import { IAudio } from "@designcombo/types";
 export const AUDIOS = [
   // https://ik.imagekit.io/pablituuu/like_a_player.mp3?updatedAt=1722278521488
   {
+    id: "xxxy10",
+    details: {
+      src: "https://v3.fal.media/files/zebra/fYL0l-eeoLNMf_s4rYQIX_generated.wav",
+    },
+    name: "Zebra Gen",
+    type: "audio",
+    metadata: {
+      author: "Zebra Gen",
+    },
+  },
+  {
     id: "xxx0",
     details: {
       src: "https://cdn.designcombo.dev/audio/OpenAI%20CEO%20on%20Artificial%20Intelligence%20Changing%20Society.mp3",

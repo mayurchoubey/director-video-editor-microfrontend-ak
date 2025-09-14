@@ -1,7 +1,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useDownloadState } from "./store/use-download-state";
 import { Button } from "@/components/ui/button";
-import { CircleCheckIcon } from "lucide-react";
+import { CircleCheckIcon, CircleX } from "lucide-react";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { download } from "@/utils/download";
 import { getPrimaryAppUiUrl, config } from "@/config/environment";
@@ -13,10 +13,12 @@ const DownloadProgressModal = () => {
   // Check if we have a job queued (output with jobId but no url)
   const isJobQueued = output?.jobId && !output?.url;
   const isCompleted = progress === 100 && output?.url;
+  const status = output?.renderInfo?.status;
 
   const handleDownload = async () => {
     if (output?.url) {
-      await download(output.url, "untitled.mp4");
+      window.open(output.url, '_blank');
+      //await download(output.url, "untitled.mp4");
       console.log("downloading");
     }
   };
@@ -53,17 +55,17 @@ const DownloadProgressModal = () => {
           <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
             <div className="flex flex-col items-center space-y-4">
               <div className="font-semibold text-orange-500">
-                <CircleCheckIcon className="h-20 w-20" />
+                {status==="success"?<CircleCheckIcon className="h-20 w-20" />:<CircleX className="h-20 w-20" />}
               </div>
-              <div className="font-bold text-2xl text-orange-600">Render Job Queued!</div>
+              <div className="font-bold text-2xl text-orange-600">{status==="success"?"Render Job Queued!":"Error"}</div>
               <div className="text-muted-foreground max-w-sm text-center text-lg">
                 {output.renderInfo?.message || 'Your video render job has been successfully queued.'}
               </div>
-              <div className="text-sm text-muted-foreground">
+              {status==="success" && <div className="text-sm text-muted-foreground">
                 Visit the renders page to track progress and download when ready.
-              </div>
+              </div>}
             </div>
-            <div className="flex gap-3">
+            {status==="success" && <div className="flex gap-3">
               <Button 
                 onClick={handleVisitRendersPage} 
                 className="bg-orange-500 hover:bg-orange-600 text-white border-0 px-8 py-3 text-lg font-semibold"
@@ -79,7 +81,7 @@ const DownloadProgressModal = () => {
               >
                 Visit Renders Page
               </Button>
-            </div>
+            </div>}
           </div>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-2 space-y-4">

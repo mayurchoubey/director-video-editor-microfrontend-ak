@@ -36,6 +36,46 @@ export const VIDEOS = [
     duration: 17000,
   },
   {
+    id: "video201",
+    details: {
+      src: "https://v3.fal.media/files/penguin/bYBt8OX0wgxVI5IIDd9df_video.mp4",
+    },
+    type: "video",
+    preview:
+      "https://remotionlambda-useast1-3rne5v73bs.s3.us-east-1.amazonaws.com/demo-assets/coffee-1.png",
+    duration: 17000,
+  },
+  {
+    id: "video202",
+    details: {
+      src: "https://v3.fal.media/files/elephant/F-E-pgUVtk-EVXBMgycLA_video.mp4",
+    },
+    type: "video",
+    preview:
+      "https://remotionlambda-useast1-3rne5v73bs.s3.us-east-1.amazonaws.com/demo-assets/laptop-1.png",
+    duration: 17000,
+  },
+  {
+    id: "video203",
+    details: {
+      src: "https://v3.fal.media/files/monkey/xbAZ2BQi73CF7Gkv6hnAF_6z6-Lkg6MeICe-cIXwqMs_video.mp4",
+    },
+    type: "video",
+    preview:
+      "https://remotionlambda-useast1-3rne5v73bs.s3.us-east-1.amazonaws.com/demo-assets/group-1.png",
+    duration: 17000,
+  },
+  {
+    id: "video204",
+    details: {
+      src: "https://v3.fal.media/files/panda/ldFQfey0KqDY_QtpLyKGg_gR2NoRGpAtkS-9jo7xxtj_video.mp4",
+    },
+    type: "video",
+    preview:
+      "https://remotionlambda-useast1-3rne5v73bs.s3.us-east-1.amazonaws.com/demo-assets/statue-1.png",
+    duration: 17000,
+  },
+  {
     id: "video1",
     details: { src: "https://cdn.designcombo.dev/videos/demo-video-1.mp4" },
     type: "video",

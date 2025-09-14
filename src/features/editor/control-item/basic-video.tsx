@@ -24,6 +24,7 @@ const BasicVideo = ({
 }) => {
 	const showAll = !type;
 	const [properties, setProperties] = useState(trackItem);
+	const volumeProperty = properties.details.volume > 1?1: properties.details.volume;
 	const { setCropTarget } = useLayoutStore();
 	const handleChangeVolume = (v: number) => {
 		dispatch(EDIT_OBJECT, {
@@ -200,7 +201,9 @@ const BasicVideo = ({
 					<AspectRatio />
 					<Volume
 						onChange={(v: number) => handleChangeVolume(v)}
-						value={properties.details.volume ?? 100}
+						value={volumeProperty}
+						sliderMax={1}
+						sliderStep={0.1}
 					/>
 					<Opacity
 						onChange={(v: number) => handleChangeOpacity(v)}

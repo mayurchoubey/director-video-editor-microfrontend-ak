@@ -39,7 +39,15 @@ export const Audios = () => {
     );
   }
 
-  if (error) {
+  const renderError = () => {
+    return (error) && (<div className="flex flex-1 items-center justify-center px-4">
+          <div className="text-center text-zinc-400">
+            <p className="text-sm">Failed to load audios. Loading default audios.</p>
+            {/* <p className="text-xs mt-1">{error}</p> */}
+          </div>
+        </div>);
+  }
+  /*if (error=="dd") {
     return (
       <div className="flex flex-1 flex-col">
         <div className="text-text-primary flex h-12 flex-none items-center px-4 text-sm font-medium">
@@ -53,13 +61,14 @@ export const Audios = () => {
         </div>
       </div>
     );
-  }
+  }*/
 
   return (
     <div className="flex flex-1 flex-col">
       <div className="text-text-primary flex h-12 flex-none items-center px-4 text-sm font-medium">
         Audios
       </div>
+      {renderError()}
       <ScrollArea>
         <div className="flex flex-col px-2">
           {audios.map((audio, index) => {

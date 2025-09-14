@@ -6,9 +6,13 @@ import { useEffect, useState } from "react";
 const Volume = ({
 	value,
 	onChange,
+	sliderStep=1,
+	sliderMax=100,
 }: {
 	value: number;
 	onChange: (v: number) => void;
+	sliderStep?: number;
+	sliderMax?: number;
 }) => {
 	// Create local state to manage opacity
 	const [localValue, setLocalValue] = useState(value);
@@ -51,8 +55,8 @@ const Volume = ({
 					onValueCommit={() => {
 						onChange(localValue); // Propagate value to parent when user commits change
 					}}
-					max={100}
-					step={1}
+					max={sliderMax}
+					step={sliderStep}
 					aria-label="Temperature"
 				/>
 			</div>
