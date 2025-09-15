@@ -91,6 +91,16 @@ interface DownloadState {
   };
 }
 // Note: baseUrl is no longer used since we're using the authenticated API service
+const updateVideoVolume = (customPayload) => {
+
+  let customTrackMap = customPayload.trackItemsMap;
+  Object.keys(customTrackMap).forEach(key => {
+    if(customTrackMap?.[key]?.["type"] === "video") {
+      customTrackMap[key]["details"]["volume"] = (customTrackMap[key]["details"]["volume"]) >= 1 ? 1:customTrackMap[key]["details"]["volume"];
+    }
+  });
+  return customPayload;    
+}
 
 export const useDownloadState = create<DownloadState>((set, get) => ({
   projectId: "",
@@ -118,8 +128,9 @@ export const useDownloadState = create<DownloadState>((set, get) => ({
         if (!payload) throw new Error("Payload is not defined");
 
         // Normalize payload to plain JSON and ensure critical fields exist
-        const serializedPayload = serializeDesign(payload);
-
+        const customPayload = updateVideoVolume({...payload});
+        const serializedPayload = serializeDesign(customPayload);
+ 
         // Step 1: POST request to start rendering using authenticated primary app API
         const randId = Math.floor(Math.random() * 9999) + 1;
         const outputFileName = `demo-vid-${randId}.mp4`;
