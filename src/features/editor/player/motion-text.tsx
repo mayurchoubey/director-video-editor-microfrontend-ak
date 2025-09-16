@@ -76,11 +76,9 @@ const TextLayer: React.FC<{
 				width: "100%",
 			}}
 			suppressContentEditableWarning
-			// dangerouslySetInnerHTML={{ __html: content }}
+			 dangerouslySetInnerHTML={{ __html: content }}
 			className="designcombo_textLayer"
-		>
-			{content}
-		</div>
+		>{/* {content} */}</div>
 	);
 };
 

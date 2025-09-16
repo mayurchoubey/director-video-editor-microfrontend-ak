@@ -35,10 +35,10 @@ const Composition = () => {
 	});
 
 	const handleTextChange = (id: string, _: string) => {
+		console.log("com-id",id);
 		const elRef = document.querySelector(`.id-${id}`) as HTMLDivElement;
-		const textDiv = elRef.firstElementChild?.firstElementChild
-			?.firstElementChild as HTMLDivElement;
-
+		const textDiv = elRef.firstElementChild as HTMLDivElement;
+		console.log("textDiv",textDiv);
 		const {
 			fontFamily,
 			fontSize,
@@ -48,7 +48,7 @@ const Composition = () => {
 			textShadow,
 			webkitTextStroke,
 			textTransform,
-		} = textDiv.style;
+		} = textDiv?.style;
 		const { width } = elRef.style;
 		if (!elRef.innerText) return;
 		const newHeight = calculateTextHeight({
@@ -71,8 +71,7 @@ const Composition = () => {
 
 	const onTextBlur = (id: string, _: string) => {
 		const elRef = document.querySelector(`.id-${id}`) as HTMLDivElement;
-		const textDiv = elRef.firstElementChild?.firstElementChild
-			?.firstElementChild as HTMLDivElement;
+		const textDiv = elRef.firstElementChild as HTMLDivElement;
 		const {
 			fontFamily,
 			fontSize,
