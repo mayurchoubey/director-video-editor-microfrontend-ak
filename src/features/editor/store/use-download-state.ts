@@ -3,6 +3,32 @@ import { create } from "zustand";
 import { callPrimaryAppAPI } from "@/services/api";
 import { api } from "@/config/environment";
 
+// Convert HTML rich text to plain text with newline characters.
+// This preserves intended line breaks while removing tags/entities.
+function htmlToPlainTextWithNewlines(html?: string): string {
+  if (!html) return "";
+  try {
+    const container = document.createElement("div");
+    // First, convert explicit line-break tags to \n so they survive textContent extraction
+    const normalized = html
+      .replace(/<br\s*\/?>(?=\s*<\/div>|\s*$)/gi, "\n") // <br> at EOL
+      .replace(/<br\s*\/?>(?!\n)/gi, "\n") // any <br>
+      .replace(/<\/p>/gi, "\n")
+      .replace(/<p[^>]*>/gi, "")
+      .replace(/<\/div>/gi, "\n")
+      .replace(/<div[^>]*>/gi, "\n");
+
+    container.innerHTML = normalized;
+    let text = (container.textContent || container.innerText || "");
+    text = text.replace(/\u00A0/g, " "); // decode &nbsp;
+    // Collapse multiple blank lines, trim ends
+    text = text.replace(/\r?\n\s*\r?\n+/g, "\n").trim();
+    return text;
+  } catch {
+    return html;
+  }
+}
+
 // Ensure track items are serialized as plain JSON and include critical fields
 function serializeDesign(design: IDesign): IDesign {
   try {
@@ -32,6 +58,15 @@ function serializeDesign(design: IDesign): IDesign {
 
       // Explicitly copy non-enumerable/derived fields
       if (originalItem && typeof originalItem === "object") {
+        // Normalize text content: convert HTML to plain text with \n for Remotion backend
+        if (originalItem.type === "text") {
+          const details = (target as any).details || {};
+          if (typeof details.text === "string") {
+            details.text = htmlToPlainTextWithNewlines(details.text);
+            (target as any).details = details;
+          }
+        }
+          
         if (originalItem.trim) {
           target.trim = {
             from: originalItem.trim.from ?? 0,
