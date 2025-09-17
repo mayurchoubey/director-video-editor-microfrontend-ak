@@ -15,9 +15,10 @@ function htmlToPlainTextWithNewlines(html?: string): string {
       .replace(/<br\s*\/?>(?!\n)/gi, "\n") // any <br>
       .replace(/<\/p>/gi, "\n")
       .replace(/<p[^>]*>/gi, "")
-      .replace(/<\/div>/gi, "\n")
-      .replace(/<div[^>]*>/gi, "\n");
-
+      .replace(/<\/div><div[^>]*>/gi, "\n")
+      .replace(/<div[^>]*>/gi, "\n")
+      .replace(/<\/div>/gi, "\n");
+      
     container.innerHTML = normalized;
     let text = (container.textContent || container.innerText || "");
     text = text.replace(/\u00A0/g, " "); // decode &nbsp;
