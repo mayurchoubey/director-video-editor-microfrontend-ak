@@ -36,9 +36,10 @@ const Composition = () => {
 
 	const handleTextChange = (id: string, _: string) => {
 		const elRef = document.querySelector(`.id-${id}`) as HTMLDivElement;
-		const textDiv = elRef.firstElementChild?.firstElementChild
-			?.firstElementChild as HTMLDivElement;
-
+		// fix text box border issue for multiple lines
+		//const textDiv = elRef.firstElementChild?.firstElementChild?.firstElementChild as HTMLDivElement;
+		const textDiv = elRef.firstElementChild as HTMLDivElement;
+		
 		const {
 			fontFamily,
 			fontSize,
@@ -48,7 +49,7 @@ const Composition = () => {
 			textShadow,
 			webkitTextStroke,
 			textTransform,
-		} = textDiv.style;
+		} = textDiv?.style;
 		const { width } = elRef.style;
 		if (!elRef.innerHTML) return;
 		const newHeight = calculateTextHeight({
@@ -71,8 +72,9 @@ const Composition = () => {
 
 	const onTextBlur = (id: string, _: string) => {
 		const elRef = document.querySelector(`.id-${id}`) as HTMLDivElement;
-		const textDiv = elRef.firstElementChild?.firstElementChild
-			?.firstElementChild as HTMLDivElement;
+		// fix text box border issue for multiple lines
+		//const textDiv = elRef.firstElementChild?.firstElementChild?.firstElementChild as HTMLDivElement;
+		const textDiv = elRef.firstElementChild as HTMLDivElement;
 		const {
 			fontFamily,
 			fontSize,
@@ -82,7 +84,7 @@ const Composition = () => {
 			textShadow,
 			webkitTextStroke,
 			textTransform,
-		} = textDiv.style;
+		} = textDiv?.style;
 		const { width } = elRef.style;
 		if (!elRef.innerHTML) return;
 		const newHeight = calculateTextHeight({
