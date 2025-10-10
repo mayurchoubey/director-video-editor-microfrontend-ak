@@ -36,9 +36,7 @@ const Composition = () => {
 
 	const handleTextChange = (id: string, _: string) => {
 		const elRef = document.querySelector(`.id-${id}`) as HTMLDivElement;
-		const textDiv = elRef.firstElementChild?.firstElementChild
-			?.firstElementChild as HTMLDivElement;
-
+		const textDiv = elRef?.firstElementChild as HTMLDivElement;
 		const {
 			fontFamily,
 			fontSize,
@@ -48,16 +46,16 @@ const Composition = () => {
 			textShadow,
 			webkitTextStroke,
 			textTransform,
-		} = textDiv.style;
+		} = textDiv?.style;
 		const { width } = elRef.style;
-		if (!elRef.innerHTML) return;
+		if (!elRef.innerText) return;
 		const newHeight = calculateTextHeight({
 			family: fontFamily,
 			fontSize,
 			fontWeight,
 			letterSpacing,
 			lineHeight,
-			text: elRef.innerHTML || "",
+			text: elRef.innerText || "",
 			textShadow: textShadow,
 			webkitTextStroke,
 			width,
@@ -84,14 +82,14 @@ const Composition = () => {
 			textTransform,
 		} = textDiv.style;
 		const { width } = elRef.style;
-		if (!elRef.innerHTML) return;
+		if (!elRef.innerText) return;
 		const newHeight = calculateTextHeight({
 			family: fontFamily,
 			fontSize,
 			fontWeight,
 			letterSpacing,
 			lineHeight,
-			text: elRef.innerHTML || "",
+			text: elRef.innerText || "",
 			textShadow: textShadow,
 			webkitTextStroke,
 			width,
@@ -137,7 +135,7 @@ const Composition = () => {
 							payload: {
 								[editableTextId]: {
 									details: {
-										text: element?.innerHTML || "",
+										text: element?.textContent || "",
 									},
 								},
 							},
