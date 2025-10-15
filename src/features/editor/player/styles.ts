@@ -60,18 +60,22 @@ export const calculateContainerStyles = (
 	details: ITrackItem["details"],
 	crop: ITrackItem["details"]["crop"] = {},
 	overrides: React.CSSProperties = {},
+	type?: string
 ): React.CSSProperties => {
 	return {
 		pointerEvents: "auto",
 		top: details.top || 0,
 		left: details.left || 0,
 		width: crop.width || details.width || "100%",
-		height: crop.height || details.height || "auto",
+		height:
+			type === "text" || type === "caption"
+				? "max-content"
+				: crop.height || details.height || "max-content",
 		transform: details.transform || "none",
 		opacity: details.opacity !== undefined ? details.opacity / 100 : 1,
 		transformOrigin: details.transformOrigin || "center center",
 		filter: `brightness(${details.brightness}%) blur(${details.blur}px)`,
 		rotate: details.rotate || "0deg",
-		...overrides, // Merge overrides into the calculated styles
+		...overrides // Merge overrides into the calculated styles
 	};
 };

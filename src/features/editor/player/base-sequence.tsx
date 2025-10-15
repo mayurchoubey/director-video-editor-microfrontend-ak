@@ -39,6 +39,12 @@ export const BaseSequence = ({
 		width: item.details.width,
 		height: item.details.height,
 	};
+	const background =
+		details?.background?.type === "color"
+			? details?.background?.value
+			: typeof details?.background === "string"
+				? details?.background
+				: "transparent";
 
 	return (
 		<Sequence
@@ -53,9 +59,19 @@ export const BaseSequence = ({
 				id={item.id}
 				data-track-item="transition-element"
 				className={`designcombo-scene-item id-${item.id} designcombo-scene-item-type-${item.type}`}
-				style={calculateContainerStyles(details, crop, {
-					pointerEvents: item.type === "audio" ? "none" : "auto",
-				})}
+				style={calculateContainerStyles(
+					details,
+					crop,
+					{
+						background,
+						pointerEvents: item.type === "audio" ? "none" : "auto",
+						overflow:
+							item.type !== "caption" && item.type !== "text"
+								? "hidden"
+								: "visible"
+					},
+					item.type
+				)}
 			>
 				{children}
 			</AbsoluteFill>
