@@ -69,8 +69,7 @@ const Composition = () => {
 
 	const onTextBlur = (id: string, _: string) => {
 		const elRef = document.querySelector(`.id-${id}`) as HTMLDivElement;
-		const textDiv = elRef.firstElementChild?.firstElementChild
-			?.firstElementChild as HTMLDivElement;
+		const textDiv = elRef.firstElementChild?.firstElementChild as HTMLDivElement;
 		const {
 			fontFamily,
 			fontSize,

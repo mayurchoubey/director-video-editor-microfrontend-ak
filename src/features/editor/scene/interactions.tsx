@@ -12,6 +12,7 @@ import {
 import useStore from "../store/use-store";
 import StateManager from "@designcombo/state";
 import { getCurrentTime } from "../utils/time";
+import { calculateMinWidth,scaleDiv, htmlToPlainText, calculateTextHeight } from "../utils/text";
 
 let holdGroupPosition: Record<string, any> | null = null;
 let dragStartEnd = false;
@@ -309,62 +310,206 @@ export function SceneInteractions({
 				target,
 				width: nextWidth,
 				height: nextHeight,
-				direction,
-			}) => {
-				if (direction[1] === 1) {
-					const currentWidth = target.clientWidth;
-					const currentHeight = target.clientHeight;
-
-					// Get new width and height
-					const scaleY = nextHeight / currentHeight;
-					const scale = scaleY;
-
-					// Update target dimensions
-					target.style.width = `${currentWidth * scale}px`;
-					target.style.height = `${currentHeight * scale}px`;
-
-					// Safely access nested elements
-					const animationDiv = target.firstElementChild
+				direction
+			  }) => {
+				const id = getIdFromClassName(target.className);
+				if (direction[1] === 1 || direction[1] === -1) {
+				   
+				  // Check if this is pure "s" direction (only vertical, no horizontal change)
+				  const isPureSouthDirection =
+					(direction[1] === 1 || direction[1] === -1) && direction[0] === 0;
+		
+				  // Handle "s" target type with content-aware height constraints (only for pure south direction)
+				  if (
+					isPureSouthDirection &&
+					(trackItemsMap[id].type === "text" ||
+					  trackItemsMap[id].type === "caption")
+				  ) {
+					const type = trackItemsMap[id].type;
+		
+					const selector =
+					  type === "text" ? `[data-text-id="${id}"]` : `#caption-${id}`;
+		
+					const textEl = document.querySelector(selector) as HTMLDivElement;
+		
+					if (textEl) {
+					  // Calculate minimum content height for current width
+					  const minContentHeight = calculateTextHeight({
+						family: textEl.style.fontFamily,
+						fontSize: textEl.style.fontSize,
+						fontWeight: textEl.style.fontWeight,
+						letterSpacing: textEl.style.letterSpacing,
+						lineHeight: textEl.style.lineHeight,
+						text: (textEl as HTMLDivElement).innerHTML,
+						textShadow: textEl.style.textShadow,
+						webkitTextStroke: textEl.style.webkitTextStroke,
+						width: nextWidth + "px",
+						textTransform: textEl.style.textTransform
+					  });
+		
+					  // Use the larger of the requested height or minimum content height
+					  const finalHeight = Math.max(nextHeight, minContentHeight);
+		
+					  // Update target dimensions
+					  target.style.width = `${nextWidth}px`;
+					  target.style.height = `${finalHeight}px`;
+		
+					  // Safely access nested elements
+					  const animationDiv = target.firstElementChild
 						?.firstElementChild as HTMLDivElement | null;
-					if (animationDiv) {
-						animationDiv.style.width = `${currentWidth * scale}px`;
-						animationDiv.style.height = `${currentHeight * scale}px`;
-
-						const textDiv =
-							animationDiv.firstElementChild as HTMLDivElement | null;
-						if (textDiv) {
-							const fontSize = Number.parseFloat(
-								getComputedStyle(textDiv).fontSize,
-							);
-							textDiv.style.fontSize = `${fontSize * scale}px`;
-							textDiv.style.width = `${currentWidth * scale}px`;
-							textDiv.style.height = `${currentHeight * scale}px`;
-						}
-					}
-				} else {
-					target.style.width = `${nextWidth}px`;
-					target.style.height = `${nextHeight}px`;
-
-					// Safely access nested elements
-					const animationDiv = target.firstElementChild
-						?.firstElementChild as HTMLDivElement | null;
-					if (animationDiv) {
+					  if (animationDiv) {
 						animationDiv.style.width = `${nextWidth}px`;
-						animationDiv.style.height = `${nextHeight}px`;
-
-						const textDiv =
-							animationDiv.firstElementChild as HTMLDivElement | null;
+						animationDiv.style.height = `${finalHeight}px`;
+		
+						const textDiv = document.querySelector(
+						  `[data-text-id="${id}"]`
+						) as HTMLDivElement;
 						if (textDiv) {
-							textDiv.style.width = `${nextWidth}px`;
-							textDiv.style.height = `${nextHeight}px`;
+						  textDiv.style.width = `${nextWidth}px`;
+						  textDiv.style.height = `${finalHeight}px`;
 						}
+					  }
+		
+					  // Update state with final dimensions
+					  setState({
+						trackItemsMap: {
+						  ...trackItemsMap,
+						  [id]: {
+							...trackItemsMap[id],
+							details: {
+							  ...trackItemsMap[id].details,
+							  width: nextWidth,
+							  height: finalHeight
+							}
+						  }
+						}
+					  });
+					  return;
 					}
-				}
-			}}
+				  }
+		
+				  // Default behavior for other element types (proportional scaling)
+				  const currentWidth = target.clientWidth;
+				  const currentHeight = target.clientHeight;
+		
+				  // Get new width and height
+				  const scaleY = nextHeight / currentHeight;
+				  const scale = scaleY;
+		
+				  // Update target dimensions
+				  target.style.width = `${currentWidth * scale}px`;
+				  target.style.height = `${currentHeight * scale}px`;
+		
+				  // Safely access nested elements
+				  const animationDiv = target.firstElementChild
+					?.firstElementChild as HTMLDivElement | null;
+				  if (animationDiv) {
+					animationDiv.style.width = `${currentWidth * scale}px`;
+					//animationDiv.style.height = `${currentHeight * scale}px`;
+		
+					if (trackItemsMap[id].type === "text") {
+					  scaleDiv(
+						`[data-text-id="${id}"]`,
+						scale,
+						currentWidth,
+						currentHeight
+					  );
+					} else if (trackItemsMap[id].type === "caption") {
+					  scaleDiv(`#caption-${id}`, scale, currentWidth, currentHeight);
+					}
+				  }
+				} else {
+				  const id = getIdFromClassName(target.className);
+				  if (
+					trackItemsMap[id].type === "text" ||
+					trackItemsMap[id].type === "caption"
+				  ) {
+					const type = trackItemsMap[id].type;
+		
+					const selector =
+					  type === "text" ? `[data-text-id="${id}"]` : `#caption-${id}`;
+		
+					const textEl = document.querySelector(selector) as HTMLDivElement;
+		
+					const newHeight = calculateTextHeight({
+					  family: textEl!.style.fontFamily,
+					  fontSize: textEl!.style.fontSize,
+					  fontWeight: textEl!.style.fontWeight,
+					  letterSpacing: textEl!.style.letterSpacing,
+					  lineHeight: textEl!.style.lineHeight,
+					  text: (textEl! as HTMLDivElement).innerHTML,
+					  textShadow: textEl!.style.textShadow,
+					  webkitTextStroke: textEl!.style.webkitTextStroke,
+					  width: nextWidth + "px",
+					  textTransform: textEl!.style.textTransform
+					});
+		
+					const validHeight = calculateTextHeight({
+					  family: textEl!.style.fontFamily,
+					  fontSize: textEl!.style.fontSize,
+					  fontWeight: textEl!.style.fontWeight,
+					  letterSpacing: textEl!.style.letterSpacing,
+					  lineHeight: textEl!.style.lineHeight,
+					  text: htmlToPlainText((textEl! as HTMLDivElement).innerHTML),
+					  textShadow: textEl!.style.textShadow,
+					  webkitTextStroke: textEl!.style.webkitTextStroke,
+					  width: nextWidth + "px",
+					  textTransform: textEl!.style.textTransform
+					});
+		
+					const minWidth = calculateMinWidth({
+					  family: textEl!.style.fontFamily,
+					  fontSize: textEl!.style.fontSize,
+					  fontWeight: textEl!.style.fontWeight,
+					  letterSpacing: textEl!.style.letterSpacing,
+					  lineHeight: textEl!.style.lineHeight,
+					  text: (textEl! as HTMLDivElement).innerText,
+					  textShadow: textEl!.style.textShadow,
+					  webkitTextStroke: textEl!.style.webkitTextStroke,
+					  textTransform: textEl!.style.textTransform
+					});
+					target.style.width = nextWidth + "px";
+					target.style.minWidth = minWidth + "px";
+					target.style.height = newHeight + "px";
+		
+					// Safely access nested elements
+					const animationDiv = target.firstElementChild
+					  ?.firstElementChild as HTMLDivElement | null;
+					if (animationDiv) {
+					  animationDiv.style.width = `${nextWidth}px`;
+					  //animationDiv.style.height = `${validHeight}px`;
+		
+					  const type = trackItemsMap[id].type;
+					  const selector =
+						type === "text" ? `[data-text-id="${id}"]` : `#caption-${id}`;
+		
+					  const textDiv = document.querySelector(
+						selector
+					  ) as HTMLDivElement | null;
+		
+					  if (textDiv) {
+						textDiv.style.width = `${nextWidth}px`;
+						textDiv.style.height = `${validHeight}px`;
+					  }
+					}
+					if (Math.floor(newHeight) !== Math.floor(validHeight)) {
+					  dispatch(EDIT_OBJECT, {
+						payload: {
+						  [id]: {
+							details: {
+							  width: nextWidth,
+							  height: newHeight
+							}
+						  }
+						}
+					  });
+					}
+				  }
+				   
+			  }} }
 			onResizeEnd={({ target }) => {
 				const targetId = getIdFromClassName(target.className) as string;
-				const textDiv = target.firstElementChild?.firstElementChild
-					?.firstElementChild as HTMLDivElement;
+				const textDiv = target.firstElementChild as HTMLDivElement;
 				dispatch(EDIT_OBJECT, {
 					payload: {
 						[targetId]: {

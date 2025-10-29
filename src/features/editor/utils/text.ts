@@ -161,3 +161,46 @@ export const calculateMinWidth = (props: Omit<TextHeightProps, "width">) => {
 
   return minWidth;
 };
+
+export const  scaleDiv = (
+  selector: string,
+  scale: number,
+  currentWidth: number,
+  currentHeight: number
+) => {
+  const div = document.querySelector(selector) as HTMLDivElement | null;
+  if (div) {
+    const fontSize = parseFloat(getComputedStyle(div).fontSize);
+    div.style.fontSize = `${fontSize * scale}px`;
+    div.style.width = `${currentWidth * scale}px`;
+    div.style.height = `${currentHeight * scale}px`;
+  }
+}
+export function htmlToPlainText(html: string): string {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+
+  const lines: string[] = [];
+
+  for (const child of div.childNodes) {
+    if (child.nodeType === Node.ELEMENT_NODE) {
+      const el = child as HTMLElement;
+
+      // Explicit handling for <br>
+      if (el.tagName === "BR") {
+        lines.push("");
+      }
+
+      // Each <div> or <p> becomes a new line (even if it's empty)
+      else if (el.tagName === "DIV" || el.tagName === "P") {
+        // If it contains <br> or is empty, it still counts as a line
+        const text = el.textContent?.replace(/\u00A0/g, ""); // Remove non-breaking spaces
+        lines.push(text || "");
+      }
+    } else if (child.nodeType === Node.TEXT_NODE) {
+      lines.push(child.textContent || "");
+    }
+  }
+
+  return lines.join("\n");
+}
